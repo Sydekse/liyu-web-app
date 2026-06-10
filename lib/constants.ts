@@ -5,8 +5,8 @@ export const NAVIGATION_ITEMS = [
   { name: "About", href: "/about" },
   { name: "Book Now", href: "/book" },
 ];
-import EventOne from "@/public/assets/images/event 1.png";
-// import EventTwo from "@/public/assets/images/event 2.png";
+import EventOne from "@/public/assets/images/h1.png";
+import EventTwo from "@/public/assets/images/h5.jpeg";
 import EventThree from "@/public/assets/images/event 3.png";
 import Eventpartiy from "@/public/assets/images/event 4.png";
 import Eventfive from "@/public/assets/images/carity.jpg";
@@ -49,7 +49,6 @@ export const PACKAGES = [
     ],
   },
 ];
-
 export const EVENT_TYPES = [
   {
     title: "Weddings",
@@ -67,14 +66,13 @@ export const EVENT_TYPES = [
   },
   {
     title: "Private Parties",
-    image:Eventpartiy      ,
+    image:Eventpartiy,
     description:
       "Celebrate life's moments with customized private party catering services.",
   },
   {
     title: "Social Gatherings",
-    image:
-      "https://images.unsplash.com/photo-1529543544282-ea669407fca3?ixlib=rb-4.0.3",
+    image: EventTwo,
     description:
       "Create lasting memories with friends and family through our social event catering.",
   },
@@ -91,7 +89,7 @@ export const PREVIOUS_EVENTS = [
     client: "Kid's Mom",
   },
   {
-    title: "Garden Wedding",
+    title: "Reunion Party",
     date: "February 2024",
     image: EventOne,
     description: "An intimate garden wedding with custom farm-to-table menu.",
@@ -99,11 +97,11 @@ export const PREVIOUS_EVENTS = [
     client: "Meseret & Dawit",
   },
   {
-    title: "Charity Gathering",
-    date: "January 2024",
+    title: "Baby Shower",
+    date: "January 2025",
     image: Eventfive,
-    description: "Elegant five-course dinner service for 300 guests.",
+    description: "Elegant five-course dinner service for a baby shower for 30 guests.",
     testimonial: "Professional service that exceeded our expectations.",
-    client: "Hope Foundation",
+    client: "Beza Ayalew",
   },
 ];
