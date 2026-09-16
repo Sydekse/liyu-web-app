@@ -111,8 +111,9 @@ export function AdminReviewsTable({
     <div className="space-y-3">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <p className="text-sm text-gray-600">
-          Reviews are invite-only. Create a link, send it to the guest, then
-          publish or hide what appears on the site.
+          Booking guests can be invited with a private link. Anyone else can
+          submit from the public Reviews page; those stay hidden until you
+          publish them.
         </p>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
@@ -192,6 +193,7 @@ export function AdminReviewsTable({
               <TableHeader>
                 <TableRow>
                   <TableHead>Guest</TableHead>
+                  <TableHead>Source</TableHead>
                   <TableHead>Event</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Rating</TableHead>
@@ -209,6 +211,9 @@ export function AdminReviewsTable({
                       <div className="text-xs text-gray-400">
                         {format(new Date(review.createdAt), "MMM d, yyyy")}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {review.source === "open" ? "Public form" : "Invite"}
                     </TableCell>
                     <TableCell>{review.eventType || "—"}</TableCell>
                     <TableCell>
@@ -238,7 +243,7 @@ export function AdminReviewsTable({
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-2 min-w-[140px]">
-                        {review.status === "pending" ? (
+                        {review.status === "pending" && review.source !== "open" ? (
                           <>
                             <Button
                               type="button"

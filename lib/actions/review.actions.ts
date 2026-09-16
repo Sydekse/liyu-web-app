@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { connectDB } from "../db";
 import { verifyAuth } from "../auth";
 import { Booking } from "../models/booking";
-import { IReview, Review, ReviewStatus } from "../models/review";
+import { IReview, Review, ReviewSource, ReviewStatus } from "../models/review";
 
 export type ReviewInvite = {
   id: string;
@@ -18,6 +18,7 @@ export type ReviewInvite = {
   rating: number | null;
   comment: string;
   published: boolean;
+  source: ReviewSource;
   submittedAt: string | null;
   createdAt: string;
 };
@@ -43,6 +44,7 @@ function serializeReview(review: IReview & { _id: unknown }): ReviewInvite {
     rating: review.rating ?? null,
     comment: review.comment ?? "",
     published: review.published,
+    source: review.source === "open" ? "open" : "invite",
     submittedAt: review.submittedAt
       ? new Date(review.submittedAt).toISOString()
       : null,
@@ -109,6 +111,7 @@ export async function inviteReviewFromBooking(bookingId: string) {
       bookingId: booking._id,
       token: createToken(),
       status: "pending",
+      source: "invite",
       published: false,
     });
 
@@ -146,6 +149,7 @@ export async function inviteCustomReview(input: {
       eventType: input.eventType?.trim() || undefined,
       token: createToken(),
       status: "pending",
+      source: "invite",
       published: false,
     });
 
@@ -275,6 +279,51 @@ export async function submitReview(input: {
     return { success: true };
   } catch (error) {
     console.error("Failed to submit review:", error);
+    return { success: false, error: "Could not save your review. Please try again." };
+  }
+}
+
+export async function submitOpenReview(input: {
+  guestName: string;
+  eventType?: string;
+  rating: number;
+  comment: string;
+}) {
+  const guestName = input.guestName?.trim();
+  const eventType = input.eventType?.trim();
+  const comment = input.comment?.trim();
+  const rating = Number(input.rating);
+
+  if (!guestName || guestName.length < 2) {
+    return { success: false, error: "Please enter your name." };
+  }
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+    return { success: false, error: "Please choose a rating from 1 to 5 stars." };
+  }
+  if (!comment || comment.length < 10) {
+    return { success: false, error: "Please share a few words about your experience." };
+  }
+  if (comment.length > 1000) {
+    return { success: false, error: "Reviews can be at most 1000 characters." };
+  }
+
+  try {
+    await connectDB();
+    await Review.create({
+      guestName,
+      eventType: eventType || undefined,
+      token: createToken(),
+      status: "submitted",
+      source: "open",
+      rating,
+      comment,
+      published: false,
+      submittedAt: new Date(),
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to submit open review:", error);
     return { success: false, error: "Could not save your review. Please try again." };
   }
 }

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Quote, Star } from "lucide-react";
 import { getPublishedReviews } from "@/lib/actions/review.actions";
@@ -45,9 +46,15 @@ export async function Testimonials() {
             What Our Clients Say
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Reviews come from guests Liyu Catering has hosted — shared after
-            their event, by invitation.
+            Hear from guests we have hosted — whether they booked online or
+            worked with us directly.
           </p>
+          <Link
+            href="/review"
+            className="inline-flex mt-6 bg-[#532516] text-white px-4 py-2 rounded-md hover:bg-[#E8982E] transition-colors"
+          >
+            Leave a review
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

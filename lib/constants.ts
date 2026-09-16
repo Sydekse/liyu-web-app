@@ -3,6 +3,7 @@ export const NAVIGATION_ITEMS = [
   { name: "Packages", href: "/packages" },
   { name: "Events", href: "/events" },
   { name: "About", href: "/about" },
+  { name: "Reviews", href: "/review" },
   { name: "Book Now", href: "/book" },
 ];
 import EventOne from "@/public/assets/images/h1.png";
