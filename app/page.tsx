@@ -1,6 +1,7 @@
 import { HeroSection } from "@/components/home/hero-section";
 import { FeaturesSection } from "@/components/home/features-section";
 import { Navbar } from "@/components/layout/navbar";
+import { Testimonials } from "@/components/reviews/testimonials";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -10,6 +11,7 @@ export default function Home() {
       <Navbar />
       <HeroSection />
       <FeaturesSection />
+      <Testimonials />
       <div className="text-center bg-[#532516] text-white rounded-lg p-12">
         <h2 className="text-3xl font-bold mb-4">
           Let&apos;s Create Something Special

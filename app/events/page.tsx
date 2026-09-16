@@ -1,9 +1,8 @@
-'use client';
-
 import { Navbar } from '@/components/layout/navbar';
 import { EVENT_TYPES } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import { PreviousEvents } from '@/components/events/previous-events';
+import { Testimonials } from '@/components/reviews/testimonials';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -59,6 +58,7 @@ export default function EventsPage() {
       </div>
       
       <PreviousEvents />
+      <Testimonials />
     </div>
   );
 }
