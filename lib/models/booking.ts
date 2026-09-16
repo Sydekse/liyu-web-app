@@ -24,7 +24,10 @@ const Booking =
 
 export { Booking };
 
+export type BookingStatus = "pending" | "confirmed" | "cancelled";
+
 export interface IBooking {
+  _id?: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -33,6 +36,6 @@ export interface IBooking {
   eventDate: Date;
   guestCount: number;
   details?: string;
-  status: "pending" | "confirmed" | "cancelled";
+  status: BookingStatus;
   createdAt: Date;
 }
