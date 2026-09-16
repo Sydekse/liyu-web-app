@@ -6,86 +6,91 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { format } from "date-fns";
-import { getBooking } from "@/lib/actions/booking.actions";
-import { IBooking } from "@/lib/models/booking";
+import { AdminDashboard } from "@/components/admin/admin-dashboard";
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [bookings, setBookings] = useState<IBooking[]>([]);
+  const [checking, setChecking] = useState(false);
   const [userName, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      VerifyToken(token);
+    if (!token) {
+      return;
     }
+
+    setChecking(true);
+
+    const verifyToken = async () => {
+      try {
+        const response = await fetch("/api/admin/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token }),
+        });
+        if (response.ok) {
+          setIsAuthenticated(true);
+        } else {
+          localStorage.removeItem("token");
+        }
+      } catch {
+        localStorage.removeItem("token");
+      } finally {
+        setChecking(false);
+      }
+    };
+
+    verifyToken();
   }, []);
 
-  const VerifyToken = async (token: string) => {
-    try {
-      const tokres = await fetch("api/admin/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
-      });
-      if (tokres.ok) {
-        setIsAuthenticated(true);
-        fetchBookings();
-      } else {
-        localStorage.remove("token");
-        setIsAuthenticated(false);
-      }
-    } catch (error) {}
-  };
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setSubmitting(true);
+
     try {
       const res = await fetch("/api/admin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userName, password }),
       });
-
       const data = await res.json();
       if (res.ok) {
-        setIsAuthenticated(true);
         localStorage.setItem("token", data.token);
-        fetchBookings();
+        setIsAuthenticated(true);
       } else {
-        alert("Invalid credentials");
+        setError(data.message || "Invalid credentials");
       }
-    } catch (error) {
-      alert("Login failed");
+    } catch {
+      setError("Login failed. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const fetchBookings = async () => {
+  const handleLogout = async () => {
+    localStorage.removeItem("token");
+    setIsAuthenticated(false);
     try {
-      const fetchedbooking = await getBooking();
-      setBookings(fetchedbooking ?? []);
-    } catch (error) {
-      console.error("Failed to fetch bookings:", error);
+      await fetch("/api/admin/logout", { method: "POST" });
+    } catch {
+      // Cookie clear is best-effort; local session is already gone.
     }
   };
 
-  useEffect(() => {
-    fetchBookings();
-  }, [isAuthenticated]);
-
-  if (!isAuthenticated) {
-    return (
-      <div>
-        <Navbar />
+  return (
+    <div>
+      <Navbar />
+      {checking ? (
+        <div className="pt-24 pb-16 text-center text-gray-600">
+          Checking your session...
+        </div>
+      ) : isAuthenticated ? (
+        <AdminDashboard onLogout={handleLogout} />
+      ) : (
         <div className="pt-24 pb-16">
           <div className="max-w-md mx-auto px-4">
             <Card className="p-6">
@@ -112,92 +117,19 @@ export default function AdminPage() {
                     required
                   />
                 </div>
+                {error ? <p className="text-sm text-red-600">{error}</p> : null}
                 <Button
                   type="submit"
+                  disabled={submitting}
                   className="w-full bg-[#532516] hover:bg-[#E8982E]"
                 >
-                  Login
+                  {submitting ? "Signing in..." : "Login"}
                 </Button>
               </form>
             </Card>
           </div>
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <Navbar />
-      <div className="pt-24 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-2xl font-bold text-[#532516]">
-              Booking Management
-            </h1>
-            <Button
-              onClick={() => window.location.reload()}
-              className="bg-[#E8982E] hover:bg-[#532516]"
-            >
-              Refresh
-            </Button>
-          </div>
-
-          <Card className="overflow-hidden">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Event Type</TableHead>
-                    <TableHead>Event Date</TableHead>
-                    <TableHead>Guests</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Contact</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {bookings.map((booking, index) => (
-                    <TableRow key={index}>
-                      <TableCell>
-                        {format(new Date(booking.createdAt), "MMM d, yyyy")}
-                      </TableCell>
-                      <TableCell>
-                        {booking.firstName} {booking.lastName}
-                      </TableCell>
-                      <TableCell>{booking.eventType}</TableCell>
-                      <TableCell>
-                        {format(new Date(booking.eventDate), "MMM d, yyyy")}
-                      </TableCell>
-                      <TableCell>{booking.guestCount}</TableCell>
-                      <TableCell>
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            booking.status === "confirmed"
-                              ? "bg-green-100 text-green-800"
-                              : booking.status === "cancelled"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-yellow-100 text-yellow-800"
-                          }`}
-                        >
-                          {booking.status}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="text-sm">
-                          <div>{booking.email}</div>
-                          <div>{booking.phone}</div>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </Card>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
