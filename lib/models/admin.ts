@@ -1,8 +1,8 @@
 import mongoose, { Schema, mongo, model, models } from "mongoose";
 
 const AdminSchema = new Schema({
-  userName: { type: String, require: true, unique: true },
-  password: { type: String, require: true },
+  userName: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
 });
 
 export interface IAdmin {
