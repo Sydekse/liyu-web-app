@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
+import { adminCookieOptions } from "@/lib/auth";
 import Admin, { IAdmin } from "@/lib/models/admin";
 
 const secret = process.env.JWT_SECRET;
@@ -48,10 +49,12 @@ export async function POST(req: Request) {
       secret as string,
       { expiresIn: "5hr" },
     );
-    return NextResponse.json(
+    const response = NextResponse.json(
       { success: true, message: "Login successful", token },
       { status: 200 },
     );
+    response.cookies.set("admin-token", token, adminCookieOptions(60 * 60 * 5));
+    return response;
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error("Error in admin login:", error.message);

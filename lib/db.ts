@@ -8,8 +8,7 @@ export const connectDB = async () => {
   if (cached.conn) return cached.conn;
 
   if (!MONGODB_URI) {
-    console.error("MONGODB_URI is missing from environment variables");
-    return;
+    throw new Error("MONGODB_URI is missing from environment variables");
   }
 
   try {
